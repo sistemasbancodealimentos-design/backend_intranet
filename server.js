@@ -1,0 +1,35 @@
+// server.js
+const express = require("express");
+const nodemailer = require("nodemailer");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post("/send-email", async (req, res) => {
+  const { nombre, email, mensaje } = req.body;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "cestobon991@gmail.com",
+      pass: "cesar1991tobon"
+    }
+  });
+
+  try {
+    await transporter.sendMail({
+      from: email,
+      to: "administrativa@bancodealimentos.co",
+      subject: "Nuevo formulario",
+      text: `Nombre: ${nombre}\nEmail: ${email}\nMensaje: ${mensaje}`
+    });
+
+    res.send("Correo enviado");
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.listen(3000, () => console.log("Servidor corriendo"));
