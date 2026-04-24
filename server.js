@@ -2,10 +2,22 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
+const mongoose = require('mongoose');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const MONGO_URI = process.env.MONGODB_URI;
+
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000, // Tiempo de espera de 5 segundos 
+  socketTimeoutMS: 45000,         // Mantiene la conexión activa 
+})
+.then(() => console.log('✅ Conexión exitosa a la Intranet en MongoDB Atlas '))
+.catch(err => {
+  console.error('❌ Error de conexión:', err.message);
+});
 
 app.post("/send-email", async (req, res) => {
   const { nombre, email, mensaje } = req.body;
