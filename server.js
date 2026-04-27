@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // ─── Conexión MongoDB ────────────────────────────────────────────────────────
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGODB_URI_INTRANET;
 
 if (!MONGO_URI) {
   console.error("❌ MONGODB_URI no está definida en las variables de entorno.");
