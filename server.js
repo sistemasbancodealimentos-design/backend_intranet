@@ -57,6 +57,99 @@ transporter.verify((error) => {
   }
 });
 
+// ─── Esquema: Tickets de Soporte Técnico ────────────────────────────────────
+const ticketSoporteSchema = new mongoose.Schema({
+  numero_ticket: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+  },
+  nombres: {
+    type: String,
+    required: true,
+  },
+  apellidos: {
+    type: String,
+    required: true,
+  },
+  area: {
+    type: String,
+    required: true,
+  },
+  cargo: {
+    type: String,
+    required: true,
+  },
+  tipo_novedad: {
+    type: String,
+    required: true,
+  },
+  descripcion_falla: {
+    type: String,
+    required: true,
+  },
+  estado: {
+    type: String,
+    default: 'Abierto',
+    enum: ['Abierto', 'En Progreso', 'Cerrado'],
+  },
+  fecha_creacion: {
+    type: Date,
+    default: Date.now,
+  },
+  fecha_actualizacion: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
+const TicketSoporte = mongoose.model('TicketSoporte', ticketSoporteSchema)
+
+// ─── Ruta: Guardar Ticket de Soporte Técnico ────────────────────────────────
+app.post("/api/tickets-soporte", async (req, res) => {
+  try {
+    const { numero_ticket, nombres, apellidos, area, cargo, tipo_novedad, descripcion_falla } = req.body
+
+    if (!numero_ticket || !nombres || !apellidos || !area || !cargo || !tipo_novedad || !descripcion_falla) {
+      return res.status(400).json({ error: "Todos los campos son obligatorios." })
+    }
+
+    const nuevoTicket = new TicketSoporte({
+      numero_ticket,
+      nombres,
+      apellidos,
+      area,
+      cargo,
+      tipo_novedad,
+      descripcion_falla,
+    })
+
+    await nuevoTicket.save()
+
+    console.log(`✅ Ticket ${numero_ticket} guardado en MongoDB`)
+    res.json({
+      ok: true,
+      message: "Ticket guardado correctamente.",
+      ticket: nuevoTicket,
+    })
+  } catch (error) {
+    console.error("❌ Error al guardar ticket:", error.message)
+    res.status(500).json({ error: "No se pudo guardar el ticket." })
+  }
+})
+
+// ─── Ruta: Obtener todos los tickets (opcional) ───────────────────────────────
+app.get("/api/tickets-soporte", async (req, res) => {
+  try {
+    const tickets = await TicketSoporte.find().sort({ fecha_creacion: -1 })
+    res.json({ ok: true, tickets })
+  } catch (error) {
+    console.error("❌ Error al obtener tickets:", error.message)
+    res.status(500).json({ error: "No se pudieron obtener los tickets." })
+  }
+})
+
 // ─── Ruta: Envío de formulario ───────────────────────────────────────────────
 app.post("/send-email", async (req, res) => {
   const { nombre, email, mensaje } = req.body;
