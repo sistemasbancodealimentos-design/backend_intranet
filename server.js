@@ -181,6 +181,17 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
+
+app.get("/health", (req, res) => {
+  const dbStatus = mongoose.connection.readyState
+  // 0=desconectado, 1=conectado, 2=conectando, 3=desconectando
+  res.json({
+    server: "ok",
+    database: dbStatus === 1 ? "conectado" : "desconectado",
+    dbState: dbStatus
+  })
+})
+
 // ─── Inicio del servidor ─────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
